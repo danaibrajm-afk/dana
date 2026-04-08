@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Balaland: Пішін және логикалық әлем</title>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&display=swap');
+
+body {
+  margin: 0;
+  font-family: 'Fredoka', sans-serif;
+  background: linear-gradient(135deg, #f6d365, #fda085);
+  text-align: center;
+}
+
+h1 {
+  margin-top: 20px;
+  color: #333;
+}
+
+.game-box {
+  margin-top: 30px;
+}
+
+.task {
+  font-size: 24px;
+  margin-bottom: 20px;
+  font-weight: bold;
+}
+
+.shapes {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* SHAPES */
+.shape {
+  width: 100px;
+  height: 100px;
+  margin: 15px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.shape:hover {
+  transform: scale(1.2) rotate(5deg);
+}
+
+/* square */
+.square {
+  background: red;
+}
+
+/* circle */
+.circle {
+  background: blue;
+  border-radius: 50%;
+}
+
+/* triangle */
+.triangle {
+  width: 0;
+  height: 0;
+  border-left: 50px solid transparent;
+  border-right: 50px solid transparent;
+  border-bottom: 100px solid green;
+}
+
+/* SCORE */
+.score {
+  font-size: 20px;
+  margin-top: 10px;
+}
+
+.popup {
+  font-size: 30px;
+  margin-top: 10px;
+  animation: pop 0.5s;
+}
+
+@keyframes pop {
+  0% {transform: scale(0);}
+  100% {transform: scale(1);}
+}
+</style>
+
+</head>
+<body>
+
+<h1>🎮 Пішін және логикалық әлем</h1>
+
+<div class="score">⭐ Ұпай: <span id="score">0</span></div>
+
+<div class="game-box">
+  <div id="task" class="task">...</div>
+
+  <div class="shapes">
+    <div class="shape square" onclick="check('red square')"></div>
+    <div class="shape circle" onclick="check('blue circle')"></div>
+    <div class="shape triangle" onclick="check('green triangle')"></div>
+  </div>
+</div>
+
+<div id="popup"></div>
+
+<script>
+let score = 0;
+let current = "";
+
+let tasks = [
+  {text:"Қызыл шаршыны тап!", value:"red square"},
+  {text:"Көк шеңберді тап!", value:"blue circle"},
+  {text:"Жасыл үшбұрышты тап!", value:"green triangle"}
+];
+
+function newTask(){
+  let t = tasks[Math.floor(Math.random()*tasks.length)];
+  current = t.value;
+  document.getElementById("task").innerText = t.text;
+}
+
+function check(val){
+  let popup = document.getElementById("popup");
+
+  if(val === current){
+    score += 10;
+    popup.innerHTML = "🎉 Дұрыс!";
+  } else {
+    popup.innerHTML = "❌ Қате!";
+  }
+
+  document.getElementById("score").innerText = score;
+
+  setTimeout(()=>{
+    popup.innerHTML = "";
+    newTask();
+  }, 800);
+}
+
+newTask();
+</script>
+
+</body>
+</html>

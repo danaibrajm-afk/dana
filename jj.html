@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+<meta charset="UTF-8">
+<title>Balaland: Сиқырлы ми квесті</title>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&display=swap');
+
+body {
+  margin: 0;
+  font-family: 'Fredoka', sans-serif;
+  background: linear-gradient(135deg, #89f7fe, #66a6ff);
+  text-align: center;
+  color: #333;
+}
+
+h1 {
+  margin-top: 20px;
+}
+
+.container {
+  padding: 20px;
+}
+
+.btn {
+  padding: 15px 25px;
+  margin: 10px;
+  border: none;
+  border-radius: 15px;
+  font-size: 18px;
+  cursor: pointer;
+  background: #ff7eb3;
+  color: white;
+  transition: 0.3s;
+}
+
+.btn:hover {
+  transform: scale(1.1);
+  background: #ff4d94;
+}
+
+.hidden {
+  display: none;
+}
+
+/* MEMORY GAME */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, 90px);
+  gap: 10px;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.card {
+  width: 90px;
+  height: 90px;
+  background: #444;
+  border-radius: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 35px;
+  color: white;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.card:hover {
+  transform: scale(1.1);
+}
+
+/* COLOR GAME */
+.colors {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.color {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  margin: 10px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.color:hover {
+  transform: scale(1.2);
+}
+
+/* SCORE */
+.score {
+  font-size: 20px;
+  margin-top: 10px;
+}
+
+/* POPUP */
+#popup {
+  display: none;
+  font-size: 32px;
+  font-weight: bold;
+  margin-top: 20px;
+  animation: pop 0.5s;
+}
+
+@keyframes pop {
+  0% {transform: scale(0);}
+  100% {transform: scale(1);}
+}
+</style>
+
+</head>
+<body>
+
+<h1>🎮 Balaland: Сиқырлы ми квесті</h1>
+
+<div class="container">
+
+<button class="btn" onclick="startMemory()">🧠 Есте сақтау ойыны</button>
+<button class="btn" onclick="startColor()">🎨 Түс ойыны</button>
+
+<div class="score">⭐ Ұпай: <span id="score">0</span></div>
+
+<!-- MEMORY -->
+<div id="memory" class="hidden">
+  <h2>Жұптарды тап!</h2>
+  <div id="grid" class="grid"></div>
+</div>
+
+<!-- COLOR -->
+<div id="colorGame" class="hidden">
+  <h2 id="task">Түсті тап</h2>
+  <div class="colors">
+    <div class="color" style="background:red" onclick="checkColor('red')"></div>
+    <div class="color" style="background:blue" onclick="checkColor('blue')"></div>
+    <div class="color" style="background:green" onclick="checkColor('green')"></div>
+    <div class="color" style="background:yellow" onclick="checkColor('yellow')"></div>
+  </div>
+</div>
+
+<div id="popup"></div>
+
+</div>
+
+<script>
+let score = 0;
+
+function updateScore(points){
+  score += points;
+  document.getElementById("score").innerText = score;
+}
+
+// POPUP
+function showPopup(text, color){
+  let popup = document.getElementById("popup");
+  popup.innerText = text;
+  popup.style.color = color;
+  popup.style.display = "block";
+
+  setTimeout(()=>{
+    popup.style.display = "none";
+  }, 1000);
+}
+
+// MEMORY GAME
+function startMemory(){
+  document.getElementById("memory").classList.remove("hidden");
+  document.getElementById("colorGame").classList.add("hidden");
+  createCards();
+}
+
+let icons = ["🐶","🐶","🍎","🍎","⭐","⭐","🚗","🚗"];
+let first = null;
+
+function createCards(){
+  let grid = document.getElementById("grid");
+  grid.innerHTML = "";
+  icons.sort(() => 0.5 - Math.random());
+
+  icons.forEach(icon=>{
+    let card = document.createElement("div");
+    card.className = "card";
+    card.innerHTML = "?";
+    card.dataset.value = icon;
+
+    card.onclick = ()=>{
+      card.innerHTML = icon;
+
+      if(!first){
+        first = card;
+      } else {
+        if(first.dataset.value === icon){
+          updateScore(10);
+          showPopup("🎉 Дұрыс!", "green");
+          first = null;
+        } else {
+          setTimeout(()=>{
+            card.innerHTML = "?";
+            first.innerHTML = "?";
+            showPopup("❌ Қате!", "red");
+            first = null;
+          }, 600);
+        }
+      }
+    };
+
+    grid.appendChild(card);
+  });
+}
+
+// COLOR GAME (ҚАЗАҚША)
+let colors = [
+  {name:"қызыл", value:"red"},
+  {name:"көк", value:"blue"},
+  {name:"жасыл", value:"green"},
+  {name:"сары", value:"yellow"}
+];
+
+let current = "";
+
+function startColor(){
+  document.getElementById("colorGame").classList.remove("hidden");
+  document.getElementById("memory").classList.add("hidden");
+  nextColor();
+}
+
+function nextColor(){
+  let c = colors[Math.floor(Math.random()*colors.length)];
+  current = c.value;
+  document.getElementById("task").innerText = "Тап: " + c.name;
+}
+
+function checkColor(color){
+  if(color === current){
+    updateScore(5);
+    showPopup("🎉 Дұрыс!", "green");
+    nextColor();
+  } else {
+    showPopup("❌ Қате!", "red");
+  }
+}
+</script>
+
+</body>
+</html>
